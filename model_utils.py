@@ -1,3 +1,10 @@
+"""
+Defines Model class, which contains all methods needed
+for simulating the dynamics.
+
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
@@ -5,8 +12,8 @@ from scipy.integrate import odeint
 
 class Model:
 
-    def __init__(self, S_th, D_th, r_R1, alpha1, r_01, r_Rt1, 
-                 r_t1, k1, r_R2, r_02, r_Rt2, r_t2, k2, n, a, sigma):
+    def __init__(self, S_th, D_th, r_R1, alpha1, r_01, r_Rt1, r_t1, k1, r_R2,
+                 r_02, r_Rt2, r_t2, k2, n, a, sigma, max_cell_num):
 
         self.S_th = S_th
         self.D_th = D_th
@@ -15,7 +22,7 @@ class Model:
         self.r_01 = r_01
         self.r_Rt1 = r_Rt1
         self.r_t1 = r_t1
-        
+
         self.k1 = k1
         self.k2 = k2
         self.r_R2 = r_R2
@@ -26,9 +33,6 @@ class Model:
         self.n = n
         self.a = a
         self.sigma = sigma
-        self.Pop = None
-
-    def create_Pop(self, max_cell_num):
         self.Pop = np.zeros((max_cell_num, 3))  # properties: (xA,xB,alive)
 
     def create_cell(self, xA, xB):
@@ -105,7 +109,7 @@ class Model:
             np.random.uniform(size=len(living_indices)) < 0.03*dt]
         self.Pop[death_indices, 2] = 0.
 
-    def plot_Pop(self, living_indices=None):
+    def plot_Pop(self, living_indices=None, show=True):
         if living_indices is None:
             living_indices = np.where(self.Pop[:, 2] == 1)[0]
 
@@ -135,4 +139,8 @@ class Model:
         plt.xlabel('Genes')
         plt.ylabel('Spatial organization')
         plt.title('lambdaD = '+str(lambdaD))
+
+        if show:
+            plt.show()
+
         return

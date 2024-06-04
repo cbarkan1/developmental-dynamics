@@ -1,4 +1,7 @@
+"""
+Specification of model parameters
 
+"""
 
 S_th = 1.5  # xB threshold
 D_th = 0.5  # xB threshold
@@ -26,7 +29,7 @@ params = [S_th, D_th, r_R1, alpha1, r_01, r_Rt1,
 
 
 """
-#These parameters give Huang's 3 state vector field
+#These parameters give Huang's 3-attractor vector field
 r_R1 = 0
 r_01 = 1.
 r_Rt1 = 1.
