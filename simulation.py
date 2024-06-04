@@ -1,5 +1,4 @@
 """
-
 Simulates a minimal developmental model inspired by hematopoietic stem
 cell differentiation.
 
@@ -25,49 +24,30 @@ model.create_cell(0.05, .5)
 
 model.plot_Pop()
 
-
 N_Ss = np.zeros(num_steps)
 N_Sts = np.zeros(num_steps)
 N_Ds = np.zeros(num_steps)
 for step in range(num_steps):
+    # Update living_indices and nonliving_indices
     living_indices = np.where(model.Pop[:, 2] == 1)[0]
     nonliving_indices = np.where(model.Pop[:, 2] == 0)[0]
 
+    # Record populations
     N_Ss[step], N_Sts[step], N_Ds[step] = model.find_Ns(
         living_indices=living_indices)
 
     # Lambda dynamics
     lambdaS, lambdaD = model.find_lambdas(living_indices)
 
-    # Gene Dynamics
-    V0, V1 = model.V(model.Pop[living_indices, 0],
-                     model.Pop[living_indices, 1], lambdaD)
-    model.Pop[living_indices, 0] += dt*V0 + 0.01*model.Pop[living_indices, 0] \
-        * np.sqrt(dt)*np.random.normal(size=len(living_indices))
-    model.Pop[living_indices, 1] += dt*V1 + 0.01*model.Pop[living_indices, 1] \
-        * np.sqrt(dt)*np.random.normal(size=len(living_indices))
+    # Gene regulatory dynamics
+    model.update_gene_state(dt, living_indices, lambdaD)
 
     # Cell division
-    betas = model.beta(model.Pop[living_indices, 1], lambdaS, lambdaD)
-    division_indices = living_indices[
-        np.random.uniform(size=len(living_indices)) < betas*dt]
-    for i, index in enumerate(division_indices):
-        if model.Pop[index, 1] > model.S_th:  # Symmetric
-            model.Pop[nonliving_indices[i], :] = model.Pop[index, :].copy()
-        elif model.Pop[index, 1] >= model.D_th:  # Assymetric
-            d_xA = 0.95*model.Pop[index, 0]
-            d_xB = 0.95*model.Pop[index, 1]
-            model.Pop[nonliving_indices[i], :] = [
-                model.Pop[index, 0]+d_xA, model.Pop[index, 1]-d_xB, 1]
-            model.Pop[index, :] = [
-                model.Pop[index, 0]-d_xA, model.Pop[index, 1]+d_xB, 1]
-
-    living_indices = np.where(model.Pop[:, 2] == 1)[0]
+    model.cell_division(dt, living_indices, nonliving_indices,
+                        lambdaS, lambdaD)
 
     # Cell death
-    death_indices = living_indices[
-        np.random.uniform(size=len(living_indices)) < 0.03*dt]
-    model.Pop[death_indices, 2] = 0.
+    model.cell_death(dt, living_indices)
 
 model.plot_Pop(living_indices)
 plt.figure()

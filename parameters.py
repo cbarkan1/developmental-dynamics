@@ -19,8 +19,10 @@ k2 = 1
 n = 4
 a = .5**n
 
+sigma = 0.01
+
 params = [S_th, D_th, r_R1, alpha1, r_01, r_Rt1, 
-          r_t1, k1, r_R2, r_02, r_Rt2, r_t2, k2, n, a]
+          r_t1, k1, r_R2, r_02, r_Rt2, r_t2, k2, n, a, sigma]
 
 
 """

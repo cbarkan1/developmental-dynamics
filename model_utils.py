@@ -6,7 +6,7 @@ from scipy.integrate import odeint
 class Model:
 
     def __init__(self, S_th, D_th, r_R1, alpha1, r_01, r_Rt1, 
-                 r_t1, k1, r_R2, r_02, r_Rt2, r_t2, k2, n, a):
+                 r_t1, k1, r_R2, r_02, r_Rt2, r_t2, k2, n, a, sigma):
 
         self.S_th = S_th
         self.D_th = D_th
@@ -25,6 +25,7 @@ class Model:
 
         self.n = n
         self.a = a
+        self.sigma = sigma
         self.Pop = None
 
     def create_Pop(self, max_cell_num):
@@ -54,6 +55,16 @@ class Model:
 
         return V1, V2
 
+    def update_gene_state(self, dt, living_indices, lambdaD):
+        V0, V1 = self.V(self.Pop[living_indices, 0],
+                        self.Pop[living_indices, 1], lambdaD)
+        self.Pop[living_indices, 0] += dt*V0 \
+            + self.sigma*self.Pop[living_indices, 0] \
+            * np.sqrt(dt)*np.random.normal(size=len(living_indices))
+        self.Pop[living_indices, 1] += dt*V1 \
+            + self.sigma*self.Pop[living_indices, 1] \
+            * np.sqrt(dt)*np.random.normal(size=len(living_indices))
+
     def beta(self, xB, lambdaS, lambdaD):
         return np.heaviside(xB-self.S_th, 1) * 7./(7. + np.exp(lambdaS*0.5)) \
             + 0.6 * np.heaviside(self.S_th-xB, 1)*np.heaviside(xB-self.D_th, 1)
@@ -72,6 +83,27 @@ class Model:
         lambdaS = np.sum(self.Pop[living_indices, 1] > self.S_th)
         lambdaD = np.sum(self.Pop[living_indices, 1] < self.D_th)
         return lambdaS, lambdaD
+
+    def cell_division(self, dt, living_indices, nonliving_indices,
+                      lambdaS, lambdaD):
+        betas = self.beta(self.Pop[living_indices, 1], lambdaS, lambdaD)
+        division_indices = living_indices[
+            np.random.uniform(size=len(living_indices)) < betas*dt]
+        for i, index in enumerate(division_indices):
+            if self.Pop[index, 1] > self.S_th:  # Symmetric
+                self.Pop[nonliving_indices[i], :] = self.Pop[index, :].copy()
+            elif self.Pop[index, 1] >= self.D_th:  # Assymetric
+                d_xA = 0.95*self.Pop[index, 0]
+                d_xB = 0.95*self.Pop[index, 1]
+                self.Pop[nonliving_indices[i], :] = [
+                    self.Pop[index, 0]+d_xA, self.Pop[index, 1]-d_xB, 1]
+                self.Pop[index, :] = [
+                    self.Pop[index, 0]-d_xA, self.Pop[index, 1]+d_xB, 1]
+
+    def cell_death(self, dt, living_indices):
+        death_indices = living_indices[
+            np.random.uniform(size=len(living_indices)) < 0.03*dt]
+        self.Pop[death_indices, 2] = 0.
 
     def plot_Pop(self, living_indices=None):
         if living_indices is None:
