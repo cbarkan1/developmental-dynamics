@@ -25,6 +25,14 @@ class Model:
 
         self.n = n
         self.a = a
+        self.Pop = None
+
+    def create_Pop(self, max_cell_num):
+        self.Pop = np.zeros((max_cell_num, 3))  # properties: (xA,xB,alive)
+
+    def create_cell(self, xA, xB):
+        unliving_indices = np.where(self.Pop[:, 2] == 0)[0]
+        self.Pop[unliving_indices[0], :] = [xA, xB, 1]
 
     def V(self, y1, y2, lambdaD):
         Pt1 = y1**self.n/(self.a+y1**self.n)
@@ -50,18 +58,26 @@ class Model:
         return np.heaviside(xB-self.S_th, 1) * 7./(7. + np.exp(lambdaS*0.5)) \
             + 0.6 * np.heaviside(self.S_th-xB, 1)*np.heaviside(xB-self.D_th, 1)
 
-    def find_Ns(self, Pop, living_indices=None):
+    def find_Ns(self, living_indices=None):
         if living_indices is None:
-            living_indices = np.where(Pop[:, 2] == 1)[0]
+            living_indices = np.where(self.Pop[:, 2] == 1)[0]
 
-        N_S = np.sum(Pop[living_indices, 1] > self.S_th)
-        N_St = np.sum(np.logical_and(Pop[living_indices, 1] <= self.S_th,
-                                     Pop[living_indices, 1] >= self.D_th))
-        N_D = np.sum(Pop[living_indices, 1] < self.D_th)
+        N_S = np.sum(self.Pop[living_indices, 1] > self.S_th)
+        N_St = np.sum(np.logical_and(self.Pop[living_indices, 1] <= self.S_th,
+                                     self.Pop[living_indices, 1] >= self.D_th))
+        N_D = np.sum(self.Pop[living_indices, 1] < self.D_th)
         return N_S, N_St, N_D
 
-    def plot_Pop(self, Pop, living_indices):
-        lambdaD = np.sum(Pop[living_indices, 1] < self.D_th)
+    def find_lambdas(self, living_indices):
+        lambdaS = np.sum(self.Pop[living_indices, 1] > self.S_th)
+        lambdaD = np.sum(self.Pop[living_indices, 1] < self.D_th)
+        return lambdaS, lambdaD
+
+    def plot_Pop(self, living_indices=None):
+        if living_indices is None:
+            living_indices = np.where(self.Pop[:, 2] == 1)[0]
+
+        lambdaD = np.sum(self.Pop[living_indices, 1] < self.D_th)
 
         def dYdt(Y, t):
             V1, V2 = self.V(Y[0], Y[1], lambdaD=lambdaD)
@@ -82,7 +98,7 @@ class Model:
                      's', color='k', markersize=10)
 
         for index in living_indices:
-            plt.plot(Pop[index, 0], Pop[index, 1], 'o')
+            plt.plot(self.Pop[index, 0], self.Pop[index, 1], 'o')
 
         plt.xlabel('Genes')
         plt.ylabel('Spatial organization')
