@@ -1,9 +1,9 @@
 # Minimal Models of Biological Tissue Development
 
-This repository contains code to run simulations andreproduce figures from:
+This repository contains code to run simulations and reproduce figures from:
 
 **"Incorporating stochastic gene expression, signaling-mediated intercellular interactions, and regulated cell proliferation in models of coordinated tissue development"**  
-*Casey Barkan and Tom Chou*  
+*Casey O. Barkan and Tom Chou*  
 https://arxiv.org/abs/2501.11271
 
 # Requirements
