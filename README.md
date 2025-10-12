@@ -18,14 +18,16 @@ https://arxiv.org/abs/2501.11271
 ## Example 1
 ```bash
 cd example_1/
-python run_simulation.py  # Run simulation and plot populations
-python figure_2B.py       # Generate Figure 2B
-python figure_3A.py       # Generate Figure 3A
+python run_simulation.py        # Run simulation and plot populations
+python figure_2B.py             # Generate Figure 2B
+python figure_3A.py             # Generate Figure 3A
+python deterministic_model.py   # Generate Figure 3B (the deterministic limit)
 ```
 
 ## Example 2
 ```bash
 cd example_2/
 python run_simulation.py  # Run spatial simulation and plot populations
+python figure_4B.py       # Generate Figure 4B
 python figure_4C.py       # Generate Figure 4C
 ```

@@ -76,7 +76,7 @@ class Example_2_Model():
         fs = self.force(rs)
         max_attraction_force = abs(np.nanmin(fs))
         max_speed = max_attraction_force/self.gamma
-        assert self.movement_thresh >= 2*max_speed*dt, 'dt is too large becausemovement_thresh < 2*max_speed*dt'
+        assert self.movement_thresh >= 2*max_speed*dt, 'dt is too large because movement_thresh < 2*max_speed*dt'
 
     def run_simulation(self, dt, num_steps, save_dt):
         
