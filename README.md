@@ -8,10 +8,7 @@ https://arxiv.org/abs/2501.11271
 
 # Requirements
 
-- numpy
-- scipy  
-- matplotlib
-- shapely
+Python 3.9+, numpy, scipy, matplotlib, shapely
 
 # Usage
 
@@ -22,6 +19,7 @@ python run_simulation.py        # Run simulation and plot populations
 python figure_2B.py             # Generate Figure 2B
 python figure_3A.py             # Generate Figure 3A
 python deterministic_model.py   # Generate Figure 3B (the deterministic limit)
+python estimate_transition_rates.py   # Estimates cell type transition rates for the deterministic limit
 ```
 
 ## Example 2
